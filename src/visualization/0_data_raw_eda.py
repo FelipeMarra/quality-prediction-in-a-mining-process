@@ -6,11 +6,9 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 from plotly.offline import plot as plt
-from datetime import datetime
 
 # %%
 # Load raw data
-#df_raw = load_data("raw", date_as_index=False)
 df_raw = load_data("raw")
 
 # %%
@@ -80,8 +78,12 @@ fig.show()
 grouped = df_raw.groupby(pd.Grouper(level='date', axis=0, freq='H')).size()
 
 print(f"There unique num of samples between the hours are: {grouped.unique()}, we neeed all hours to have 180")
-print()
 
+#%%
+# The first hour has 174 samples
+print(f"The first hour has {grouped.iloc[0]} samples")
+
+#%%
 # Missing data range:
 # 2017-03-16 06:00:00
 # 2017-03-29 11:00:00 
@@ -92,27 +94,10 @@ range = pd.date_range(start="2017-03-16 06:00:00", end="2017-03-29 11:00:00", fr
 print(f"Exploring this range we get unique values: {grouped[range].unique()}")
 print(f"And a size of {grouped[range].size} values")
 
-print()
-# TODO: Hour w/ 179 samples: 2017-04-10 00:00:00
-
-# TODO: The first hour has 174 samples
-
-# TODO: change datetimes to be in the 20s freq
+#%%
+# Hour w/ 179 samples: 2017-04-10 00:00:00
+print(f"The hour 2017-04-10 00:00:00 has {grouped.loc['2017-04-10 00:00:00']} samples")
 
 #%%
-# Plot Features Over Time
-n_columns = len(df_raw.axes[1]) - 1
-
-for i in range(n_columns):
-    series = df_raw.iloc[:,i+1]
-    file_name = os.path.join(FIGURES_PATH, f"raw_eda/line/{i}_{series.name}.html")
-
-    fig = px.line(df_raw, x=df_raw.index, y=series)
-    fig.update_layout(yaxis_title=series.name, xaxis_title="Time")
-    fig.show()
-    plt(fig, filename=file_name)
-
-# The % Silica Concentrate don't show any "global" seazonality, 
-# also it doesnt apear to show any trend
-
-# %%
+# This data will be processed to ajust the timestamps at 
+# src/data_processing/1_process_timestamps.py
