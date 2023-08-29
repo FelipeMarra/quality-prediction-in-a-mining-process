@@ -5,7 +5,6 @@ from src.constants import *
 import pandas as pd
 import numpy as np
 import plotly.express as px
-from plotly.offline import plot as plt
 
 # %%
 # Load raw data
@@ -67,7 +66,7 @@ print(series)
 file_name = os.path.join(FIGURES_PATH, "raw_eda/plot_between_2_hrs-20s_sample.html")
 time_spam = 3*60*2-6
 
-fig = px.scatter(df_raw, x=df_raw.index[:time_spam], y=series[:time_spam])
+fig = px.line(df_raw, x=df_raw.index[:time_spam], y=series[:time_spam])
 fig.update_layout(yaxis_title=series.name, xaxis_title="Time")
 fig.show()
 # A. Yes, the plot lib is not subdividing the time between the hours and the
