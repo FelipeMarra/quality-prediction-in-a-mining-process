@@ -7,7 +7,7 @@ import pandas as pd
 # %%
 # Load raw data
 df_raw = load_data("raw")
-df_raw.head()
+df_raw.dtypes
 
 # Processing the data as explored in 
 # src/visualization/0_data_raw_eda.py
@@ -60,7 +60,7 @@ df = df.asfreq(freq="20S", method="ffill")
 
 #%%
 # Check freq
-grouped = df.groupby(pd.Grouper(level='date', axis=0, freq='H')).size()
+grouped = df.groupby(pd.Grouper(level="date", axis=0, freq="H")).size()
 
 print(f"The unique num of samples between the hours are: {grouped.unique()}")
 
@@ -74,8 +74,8 @@ dup_idxs
 
 #%%
 # Save dataframe
-df.to_csv(os.path.join(DATA_PATH, "interim", FILE_NAME))
+df.to_pickle(os.path.join(DATA_PATH, "interim", FILE_NAME_PKL))
 
 #%%
 # This data will be vizualized at
-# src/data_processing/2_interim_viz.py
+# src/data_processing/2_silica_concentrate_viz.py

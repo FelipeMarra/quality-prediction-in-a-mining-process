@@ -63,7 +63,7 @@ print()
 # Q. Are the information between hours are been lost?
 series = df_raw["Starch Flow"]
 print(series)
-file_name = os.path.join(FIGURES_PATH, "raw_eda/plot_between_2_hrs-20s_sample.html")
+FILE_NAME_CSV = os.path.join(FIGURES_PATH, "raw_eda/plot_between_2_hrs-20s_sample.html")
 time_spam = 3*60*2-6
 
 fig = px.line(df_raw, x=df_raw.index[:time_spam], y=series[:time_spam])
