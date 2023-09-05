@@ -61,7 +61,7 @@ print()
 # scaterr plot it to investigate the behavior given that there are many
 # samples with the same date and hour
 # Q. Are the information between hours are been lost?
-series = df_raw["Starch Flow"]
+series = df_raw[STARCH_FLOW]
 print(series)
 FILE_NAME_CSV = os.path.join(FIGURES_PATH, "raw_eda/plot_between_2_hrs-20s_sample.html")
 time_spam = 3*60*2-6
