@@ -8,6 +8,7 @@ import matplotlib.dates as mdates
 import pandas as pd
 pd.plotting.register_matplotlib_converters()
 from statsmodels.tsa import seasonal as ssnl
+from statsmodels.graphics.tsaplots import plot_acf
 
 # %% Load interim data
 df = load_data("interim", data_format="pkl")
@@ -16,8 +17,51 @@ df = load_data("interim", data_format="pkl")
 silica = df[SILICA_CONCENTRATE]
 SIZE = silica.size
 
-#%% Describe
-silica.describe() 
+#%% Scatter plot
+silica.plot(style=".", figsize=(10,5))
+
+#%% Rolling exponentially weighted mean 
+ema_silica = silica.ewm(span=180*48).mean()
+orig_vs_ema = pd.DataFrame({"silica": silica, "silica_ema": ema_silica})
+orig_vs_ema.plot(figsize=(10,5))
+
+#%% 
+orig_vs_ema[:math.ceil(SIZE/4)].plot(figsize=(10,5))
+
+#%%
+ema_silica.plot(figsize=(10,5), color="orange")
+
+#%% TODO Rolling win minimum aligned
+
+#%% Describe original silica
+silica.describe()
+
+#%% Describe with rolling mean
+ema_silica.describe()
+
+#%% ACF ORIGINAl Freq=20S
+plot_acf(silica, title="ACF Freq=20S")
+
+#%% ACF Freq=T
+plot_acf(silica.asfreq("T"), title="ACF Freq=T")
+
+#%% "ACF Freq=H"
+plot_acf(silica.asfreq("H"), title="ACF Freq=H")
+
+#%% ACF EMA Freq=H
+plot_acf(ema_silica.asfreq("H"), title="ACF EMA Freq=H")
+
+#%% "ACF Freq=D"
+plot_acf(silica.asfreq("D"), title="ACF Freq=D")
+
+#%% ACF EMA Freq=D
+plot_acf(ema_silica.asfreq("D"), title="ACF EMA Freq=D")
+
+#%%
+plot_acf(silica.asfreq("W"), title="ACF Freq=W")
+
+#%%
+plot_acf(silica.asfreq("M"), title="ACF Freq=M")
 
 #%% Line plot & Distribution
 def line_and_dist(data, freq = None, line_size=SIZE/10, shift=False, label_int=4):
@@ -39,13 +83,15 @@ def line_and_dist(data, freq = None, line_size=SIZE/10, shift=False, label_int=4
 
 #%% Simple line plot
 line_and_dist(silica)
-# Seems to show a few days seasonality 
+# Seems to show a few days seasonality
 
 #%% Differencing (by every 20s)
-#"We difference the data to remove the trend, and this transforms the data to
-# a more normally shaped distribution. [...] Most interesting is how a value changes from one
-# measurement to the next rather than the value’s actual measurement"
+#"We difference the data to remove the trend, and this transforms the data to a
+# more normally shaped distribution. [...] Most interesting is how a value changes
+# from one measurement to the next rather than the value’s actual measurement"
 line_and_dist(silica, shift=True)
+
+#TODO Minutes
 
 #%% Differencing by hour
 line_and_dist(silica, freq="H", shift=True, label_int=32)
@@ -147,3 +193,4 @@ decompose_plot(silica[180*24*6:math.trunc(SIZE/4)], "D", 1)
 #     fig.update_layout(yaxis_title=series.name, xaxis_title="Time")
 #     fig.show()
 #     plt(fig, filename=FILE_NAME_CSV)
+# %%
