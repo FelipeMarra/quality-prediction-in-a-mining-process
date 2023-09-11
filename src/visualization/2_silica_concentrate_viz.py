@@ -43,29 +43,29 @@ ema_silica.describe()
 plot_acf(silica, title="ACF Freq=20S")
 
 #%% ACF Freq=T
-plot_acf(silica.asfreq("T"), title="ACF Freq=T")
+plot_acf(silica.resample("T").mean(), title="ACF Freq=T")
 
 #%% "ACF Freq=H"
-plot_acf(silica.asfreq("H"), title="ACF Freq=H")
+plot_acf(silica.resample("H").mean(), title="ACF Freq=H")
 
 #%% ACF EMA Freq=H
 plot_acf(ema_silica.asfreq("H"), title="ACF EMA Freq=H")
 
 #%% "ACF Freq=D"
-plot_acf(silica.asfreq("D"), title="ACF Freq=D")
+plot_acf(silica.resample("D").mean(), title="ACF Freq=D")
 
 #%% ACF EMA Freq=D
 plot_acf(ema_silica.asfreq("D"), title="ACF EMA Freq=D")
 
-#%%
-plot_acf(silica.asfreq("W"), title="ACF Freq=W")
+#%% ACF Freq=W
+plot_acf(silica.resample("W").mean(), title="ACF Freq=W")
 
-#%%
-plot_acf(silica.asfreq("M"), title="ACF Freq=M")
+#%% ACF Freq=M
+plot_acf(silica.resample("M").mean(), title="ACF Freq=M")
 
 #%% Line plot & Distribution
 def line_and_dist(data, freq = None, line_size=SIZE/10, shift=False, label_int=4):
-    data = data.asfreq(freq) if freq else data
+    data = data.resample(freq).mean() if freq else data
     data = data - data.shift() if shift else data
 
     silica_label = f"Diff({SILICA_CONCENTRATE})" if shift else f"{SILICA_CONCENTRATE}"
@@ -110,7 +110,7 @@ line_and_dist(silica, freq="M", shift=True, label_int=32)
 
 #%% Plot both SLT(LOESS) and naive seasonal decompose 
 def decompose_plot(data: pd.DataFrame, freq: string, interval: int):
-    data = data.resample(freq).mean().ffill()
+    data = data.resample(freq).mean()
     
     decomp_slt = ssnl.STL(data).fit()
     decomp_naive = ssnl.seasonal_decompose(data, model = "multiplicative", extrapolate_trend="freq")
@@ -158,7 +158,7 @@ decompose_plot(hour_series, "H", 1)
 #TODO Zoom to find the period of the hours seasonality 
 
 #%% Decomposition in days full series
-decompose_plot(silica[180*24*5:], "D", 7)
+decompose_plot(silica, "D", 7)
 
 #%% Decomposition in days zoom to get a visual idea of the season period
 decompose_plot(silica[180*24*6:math.trunc(SIZE/4)], "D", 1)
