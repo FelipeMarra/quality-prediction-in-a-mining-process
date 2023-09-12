@@ -64,17 +64,19 @@ plot_acf(silica.resample("W").mean(), title="ACF Freq=W")
 plot_acf(silica.resample("M").mean(), title="ACF Freq=M")
 
 #%% Line plot & Distribution
-def line_and_dist(data, freq = None, line_size=SIZE/10, shift=False, label_int=4):
+def line_and_dist(data, freq = None, shift=False, interval=4):
     data = data.resample(freq).mean() if freq else data
+    # current - next (shift increases the indexes)
     data = data - data.shift() if shift else data
 
     silica_label = f"Diff({SILICA_CONCENTRATE})" if shift else f"{SILICA_CONCENTRATE}"
+    plt.tight_layout()
     fig, axs = plt.subplots(2,1)
     freq = freq if freq else "20S"
-    fig.suptitle(f"Line (w/ SIZE/10) and Hist (freq={freq}, shift={shift})")
+    fig.suptitle(f"Freq={freq}, Shift={shift})", y=0.92)
     fig.set_figheight(8)
-    axs[0].plot(data[:math.trunc(line_size)])
-    axs[0].xaxis.set_major_locator(mdates.DayLocator(interval=label_int))
+    axs[0].plot(data)
+    axs[0].xaxis.set_major_locator(mdates.DayLocator(interval=interval))
     axs[0].set_xlabel("dates")
     axs[0].set_ylabel(silica_label)
     axs[1].hist(data)
@@ -82,28 +84,28 @@ def line_and_dist(data, freq = None, line_size=SIZE/10, shift=False, label_int=4
     axs[1].set_xlabel(silica_label)
 
 #%% Simple line plot
-line_and_dist(silica)
-# Seems to show a few days seasonality
+line_and_dist(silica, interval=32)
 
 #%% Differencing (by every 20s)
 #"We difference the data to remove the trend, and this transforms the data to a
 # more normally shaped distribution. [...] Most interesting is how a value changes
 # from one measurement to the next rather than the value’s actual measurement"
-line_and_dist(silica, shift=True)
-
-#TODO Minutes
+line_and_dist(silica, shift=True, interval=40)
 
 #%% Differencing by hour
-line_and_dist(silica, freq="H", shift=True, label_int=32)
+line_and_dist(silica, freq="T", shift=True, interval=32)
+
+#%% Differencing by hour
+line_and_dist(silica, freq="H", shift=True, interval=32)
 
 #%% Differencing by days
-line_and_dist(silica, freq="D", shift=True, label_int=32)
+line_and_dist(silica, freq="D", shift=True, interval=32)
 
 #%% Differencing by weeks
-line_and_dist(silica, freq="W", shift=True, label_int=32)
+line_and_dist(silica, freq="W", shift=True, interval=32)
 
 #%% Differencing by weeks
-line_and_dist(silica, freq="M", shift=True, label_int=32)
+line_and_dist(silica, freq="M", shift=True, interval=32)
 
 # Looks like data don't change much over time, and tends twoards the negative side, that is, it
 # might be trending down
