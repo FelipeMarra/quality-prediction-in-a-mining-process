@@ -108,17 +108,28 @@ line_and_dist(silica, freq="M", shift=True, label_int=32)
 # Looks like data don't change much over time, and tends twoards the negative side, that is, it
 # might be trending down
 
-#%% Plot both SLT(LOESS) and naive seasonal decompose 
-def decompose_plot(data: pd.DataFrame, freq: string, interval: int):
+#%% Plot both SLT(LOESS) and naive seasonal decompose
+def decompose_plot(data: pd.DataFrame, freq:string, interval=1, comments=""): 
+    # Since seasonal_decompose can't hadle S, T, W and M, 
+    # we resample and set the period to the smallest one
     data = data.resample(freq).mean()
-    
-    decomp_slt = ssnl.STL(data).fit()
-    decomp_naive = ssnl.seasonal_decompose(data, model = "multiplicative", extrapolate_trend="freq")
-    
+    if freq in ["S", "T", "W", "M"]:
+        decomp_naive = ssnl.seasonal_decompose(data, 
+                                               period = 2,
+                                               model = "multiplicative", 
+                                               extrapolate_trend = "freq")
+        decomp_slt = ssnl.STL(data, period=2).fit()
+    # Otherwise it's preferible to mantain the statsmodels support to pd labels
+    else:
+        decomp_naive = ssnl.seasonal_decompose(data, 
+                                               model = "multiplicative", 
+                                               extrapolate_trend="freq")
+        decomp_slt = ssnl.STL(data).fit()
+
     # Plot
     plt.tight_layout()
     fig = plt.figure()
-    fig.suptitle(f"SLT & Naive Decompositions (freq={freq})")
+    fig.suptitle(f"SLT & Naive Decompositions (freq={freq}) {comments}")
     fig.set_figheight(6)
     fig.set_figwidth(10)
     gs = fig.add_gridspec(7, hspace=0.5)
@@ -147,29 +158,27 @@ def decompose_plot(data: pd.DataFrame, freq: string, interval: int):
         axs[i].xaxis.set_major_locator(mdates.DayLocator(interval=interval))
         axs[i].xaxis.set_major_formatter(mdates.DateFormatter('%d'))
 
-#%% TODO Decomposition in minutes, 20s*3( = 1 min), period = 3 ?
-# decomposition = ssnl.seasonal_decompose(silica, period = 3, model = "multiplicative", extrapolate_trend="freq")
-# decomposition.plot()
+#%% Decomposition in minutes
+decompose_plot(silica[:math.trunc(SIZE*0.0005)], freq="T", comments="SIZE/10")
 
 #%% Decomposition in hours
-hour_series = silica[:math.trunc(SIZE/10)]
-decompose_plot(hour_series, "H", 1)
+decompose_plot(silica[:math.trunc(SIZE/10)], freq="H", comments="SIZE/10")
 
-#TODO Zoom to find the period of the hours seasonality 
+#%% Decomposition in hours: Zoom to get a visual idea of the season period
+decompose_plot(silica[180*24*30:math.trunc(SIZE/4)], freq="H", comments="ZOOM")
 
 #%% Decomposition in days full series
-decompose_plot(silica, "D", 7)
+decompose_plot(silica, freq="D", interval=7)
 
-#%% Decomposition in days zoom to get a visual idea of the season period
-decompose_plot(silica[180*24*6:math.trunc(SIZE/4)], "D", 1)
-
+#%% Decomposition in days: Zoom to get a visual idea of the season period
+decompose_plot(silica[180*24*6:math.trunc(SIZE/4)], freq="D", comments="ZOOM")
 # Looks like a 7 days season
 
-#%% TODO Decomposition in weeks: 20s*3( = 1 min) * 60 ( = 1 huor) * 24 ( = 1 day) * 7 ( = 1 week)
-# decomposition = ssnl.seasonal_decompose(silica, period = 3*60*24, model = "multiplicative", extrapolate_trend="freq")
-# decomposition.plot()
+#%% Decomposition in weeks full series
+decompose_plot(silica, freq="W", interval=7)
 
-#%% TODO Decomposition in months
+#%% Decomposition in months full series
+decompose_plot(silica, freq="M", interval=7)
 
 #%% TODO
 # The shortcoming with seasonal decomposition models is that it does not capture how a season might
