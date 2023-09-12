@@ -165,20 +165,20 @@ decompose_plot(silica[:math.trunc(SIZE*0.008)], freq="5T", comments="1% of data"
 decompose_plot(silica[:math.trunc(SIZE/10)], freq="H", comments="10% of data")
 
 #%% Decomposition in hours: Zoom to get a visual idea of the season period
-decompose_plot(silica[180*24*30:math.trunc(SIZE/4)], freq="H", comments="ZOOM")
+decompose_plot(silica[:math.trunc(SIZE/4)-180*24*30], freq="H", comments="ZOOM")
 
 #%% Decomposition in days full series
 decompose_plot(silica, freq="D", interval=7)
 
 #%% Decomposition in days: Zoom to get a visual idea of the season period
-decompose_plot(silica[180*24*6:math.trunc(SIZE/4)], freq="D", comments="ZOOM")
+decompose_plot(silica[:math.trunc(SIZE/4)-180*24*6], freq="D", comments="ZOOM")
 # Looks like a 7 days season
 
 #%% Decomposition in weeks full series
 decompose_plot(silica, freq="W", interval=7)
 
 #%% Decomposition in weeks: Zoom to get a visual idea of the season period
-decompose_plot(silica[180*24*6:math.trunc(SIZE/4)], freq="W", interval=7, comments="ZOOM")
+decompose_plot(silica[:math.trunc(SIZE/2)-180*24*30], freq="W", interval=2, comments="ZOOM")
 
 #%% Decomposition in months full series
 decompose_plot(silica, freq="M", interval=7)
