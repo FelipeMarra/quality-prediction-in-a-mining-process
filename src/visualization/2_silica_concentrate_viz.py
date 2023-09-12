@@ -113,7 +113,7 @@ def decompose_plot(data: pd.DataFrame, freq:string, interval=1, comments=""):
     # Since seasonal_decompose can't hadle S, T, W and M, 
     # we resample and set the period to the smallest one
     data = data.resample(freq).mean()
-    if freq in ["S", "T", "W", "M"]:
+    if freq in ["S", "5T", "W", "M"]:
         decomp_naive = ssnl.seasonal_decompose(data, 
                                                period = 2,
                                                model = "multiplicative", 
@@ -159,10 +159,10 @@ def decompose_plot(data: pd.DataFrame, freq:string, interval=1, comments=""):
         axs[i].xaxis.set_major_formatter(mdates.DateFormatter('%d'))
 
 #%% Decomposition in minutes
-decompose_plot(silica[:math.trunc(SIZE*0.0005)], freq="T", comments="SIZE/10")
+decompose_plot(silica[:math.trunc(SIZE*0.008)], freq="5T", comments="1% of data")
 
 #%% Decomposition in hours
-decompose_plot(silica[:math.trunc(SIZE/10)], freq="H", comments="SIZE/10")
+decompose_plot(silica[:math.trunc(SIZE/10)], freq="H", comments="10% of data")
 
 #%% Decomposition in hours: Zoom to get a visual idea of the season period
 decompose_plot(silica[180*24*30:math.trunc(SIZE/4)], freq="H", comments="ZOOM")
@@ -177,29 +177,8 @@ decompose_plot(silica[180*24*6:math.trunc(SIZE/4)], freq="D", comments="ZOOM")
 #%% Decomposition in weeks full series
 decompose_plot(silica, freq="W", interval=7)
 
+#%% Decomposition in weeks: Zoom to get a visual idea of the season period
+decompose_plot(silica[180*24*6:math.trunc(SIZE/4)], freq="W", interval=7, comments="ZOOM")
+
 #%% Decomposition in months full series
 decompose_plot(silica, freq="M", interval=7)
-
-#%% TODO
-# The shortcoming with seasonal decomposition models is that it does not capture how a season might
-# change through time. For example, the characteristics of a week of electricity demand in the 
-# summer is much different than the winter. This method will determine an average seasonal pattern 
-# and leave the remaining information in the residuals. So given your characteristics vary by day
-# of week (mentioned in your other post), this won't capture that.
-
-#%% TODO
-# use pandas express to get some quick insights?
-# for each resolution? (seconds, min, hours, days, weeks, months)
-
-# Plot Features Over Time Saving in html files
-# n_columns = len(df_raw.axes[1]) - 1
-
-# for i in range(n_columns):
-#     series = df_raw.iloc[:,i+1]
-#     FILE_NAME_CSV = os.path.join(FIGURES_PATH, f"raw_eda/line/{i}_{series.name}.html")
-
-#     fig = px.line(df_raw, x=df_raw.index, y=series)
-#     fig.update_layout(yaxis_title=series.name, xaxis_title="Time")
-#     fig.show()
-#     plt(fig, filename=FILE_NAME_CSV)
-# %%
