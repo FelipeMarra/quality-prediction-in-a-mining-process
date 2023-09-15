@@ -60,7 +60,7 @@ print()
 # Since 60min * 3x group of 20s will give us the period between 1 hr
 # scaterr plot it to investigate the behavior given that there are many
 # samples with the same date and hour
-# Q. Are the information between hours that are been lost?
+# Q. Are the information between hours that are being lost?
 series = df_raw[STARCH_FLOW]
 print(series)
 FILE_NAME_CSV = os.path.join(FIGURES_PATH, "raw_eda/plot_between_2_hrs-20s_sample.html")
