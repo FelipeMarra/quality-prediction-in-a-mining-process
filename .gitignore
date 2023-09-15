@@ -1,5 +1,6 @@
 #Personal
 src/misc.py
+*.html
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

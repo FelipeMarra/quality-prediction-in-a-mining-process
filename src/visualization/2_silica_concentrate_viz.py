@@ -8,6 +8,7 @@ import matplotlib.dates as mdates
 import pandas as pd
 pd.plotting.register_matplotlib_converters()
 from statsmodels.tsa import seasonal as ssnl
+from statsmodels.tsa.stattools import adfuller
 from statsmodels.graphics.tsaplots import plot_acf
 
 # %% Load interim data
@@ -17,6 +18,7 @@ df = load_data("interim", data_format="pkl")
 silica = df[SILICA_CONCENTRATE]
 SIZE = silica.size
 
+############ Summary & Smoothing #####################################################
 #%% Scatter plot
 silica.plot(style=".", figsize=(10,5))
 
@@ -39,6 +41,14 @@ silica.describe()
 #%% Describe with rolling mean
 ema_silica.describe()
 
+############ Stationarity #####################################################
+#%% Stationarity
+size = math.ceil(SIZE*0.5)
+print(f"apply adfuller on {silica[size:].size} data points")
+print(adfuller(silica[size:]))
+# the series is stationary
+
+############ Autocorrelation Function ##########################################
 #%% ACF ORIGINAl Freq=20S
 plot_acf(silica, title="ACF Freq=20S")
 
@@ -63,8 +73,9 @@ plot_acf(silica.resample("W").mean(), title="ACF Freq=W")
 #%% ACF Freq=M
 plot_acf(silica.resample("M").mean(), title="ACF Freq=M")
 
+############ Differencing Distribution ########################################
 #%% Line plot & Distribution
-def line_and_dist(data, freq = None, shift=False, interval=4):
+def line_and_dist(data, freq = None, shift=False, interval=4, bins=None):
     data = data.resample(freq).mean() if freq else data
     # current - next (shift increases the indexes)
     data = data - data.shift() if shift else data
@@ -79,7 +90,7 @@ def line_and_dist(data, freq = None, shift=False, interval=4):
     axs[0].xaxis.set_major_locator(mdates.DayLocator(interval=interval))
     axs[0].set_xlabel("dates")
     axs[0].set_ylabel(silica_label)
-    axs[1].hist(data)
+    axs[1].hist(data, bins=bins)
     axs[1].set_ylabel("Frequency")
     axs[1].set_xlabel(silica_label)
 
@@ -90,10 +101,11 @@ line_and_dist(silica, interval=32)
 #"We difference the data to remove the trend, and this transforms the data to a
 # more normally shaped distribution. [...] Most interesting is how a value changes
 # from one measurement to the next rather than the value’s actual measurement"
-line_and_dist(silica, shift=True, interval=40)
+
+line_and_dist(silica, shift=True, interval=40, bins=100)
 
 #%% Differencing by hour
-line_and_dist(silica, freq="T", shift=True, interval=32)
+line_and_dist(silica, freq="T", shift=True, interval=32, bins=100) 
 
 #%% Differencing by hour
 line_and_dist(silica, freq="H", shift=True, interval=32)
@@ -110,7 +122,9 @@ line_and_dist(silica, freq="M", shift=True, interval=32)
 # Looks like data don't change much over time, and tends twoards the negative side, that is, it
 # might be trending down
 
+############ Decomposition #################################################
 #%% Plot both SLT(LOESS) and naive seasonal decompose
+#TODO pegar o resultado E DEPOIS dar split pra dar zoom
 def decompose_plot(data: pd.DataFrame, freq:string, interval=1, comments=""): 
     # Since seasonal_decompose can't hadle S, T, W and M, 
     # we resample and set the period to the smallest one
@@ -150,6 +164,7 @@ def decompose_plot(data: pd.DataFrame, freq:string, interval=1, comments=""):
     axs[4].plot(data.index, decomp_naive.seasonal)
     axs[4].set(ylabel="S Naive")
     # Resid
+    #TODO sera q fica melhor como linha ao invés de scatter ??????
     axs[5].scatter(data.index, decomp_slt.resid)
     axs[5].set(ylabel="R SLT")
     axs[6].scatter(data.index, decomp_naive.resid)
@@ -180,6 +195,7 @@ decompose_plot(silica[:math.trunc(SIZE/4)-180*24*6], freq="D", comments="ZOOM")
 decompose_plot(silica, freq="W", interval=7)
 
 #%% Decomposition in weeks: Zoom to get a visual idea of the season period
+#TODO pegar o resultado E DEPOIS dar split pra dar zoom
 decompose_plot(silica[:math.trunc(SIZE/2)-180*24*30], freq="W", interval=2, comments="ZOOM")
 
 #%% Decomposition in months full series
