@@ -3,7 +3,7 @@ import string
 import pandas as pd
 from src.constants import *
 
-# Starts with DATA_PATH (path to the data folder) and auto complets with FILE_NAME_CSV,
+# Path starts with DATA_PATH (constant to the data folder) and auto complets with FILE_NAME_CSV,
 # wich defaluts to "MiningProcess_Flotation_Plant_Database.csv"
 # So to acess the raw data, path_from_data should be "raw". The function will then
 # return a dataframe read from DATA_PATH/raw/FILE_NAME_CSV

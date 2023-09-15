@@ -195,7 +195,6 @@ decompose_plot(silica[:math.trunc(SIZE/4)-180*24*6], freq="D", comments="ZOOM")
 decompose_plot(silica, freq="W", interval=7)
 
 #%% Decomposition in weeks: Zoom to get a visual idea of the season period
-#TODO pegar o resultado E DEPOIS dar split pra dar zoom
 decompose_plot(silica[:math.trunc(SIZE/2)-180*24*30], freq="W", interval=2, comments="ZOOM")
 
 #%% Decomposition in months full series
